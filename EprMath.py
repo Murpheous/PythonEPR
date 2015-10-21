@@ -52,7 +52,7 @@ def ExtendedSine(theta):
     if (thetaNormalised < 0):
         integerPart -= 1
     fractionPart = theta - (integerPart*math.pi)
-    result = math.Sin(fractionPart) + integerPart*2
+    result = math.sin(fractionPart) + integerPart*2
     return result
 
 
@@ -66,7 +66,7 @@ def ExtendedArcCosSq(value):
 
 def ExtendedSineSq(theta):
     nSineSign = 1
-    integerPart = math.trunc(theta/halfPI)
+    integerPart = math.trunc(theta/halfPI())
     nOffset = 0
     if (integerPart >= 1):
         nOffset = math.trunc((integerPart + 1)/2)
