@@ -59,7 +59,7 @@ def ExtendedSine(theta):
 def ExtendedArcSinSq(value):
     intpart = math.floor(value)
     fracpart = value - intpart
-    return math.asin(math.Sqrt(fracpart)) + halfPI()*intpart
+    return math.asin(math.sqrt(fracpart)) + halfPI()*intpart
 
 def ExtendedArcCosSq(value):
     return ExtendedArcSinSq(value + 0.5) - quarterPI()
