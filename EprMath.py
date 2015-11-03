@@ -1,4 +1,10 @@
 import math
+# Vector definitions
+worldUp = (0.0, 1.0, 0.0);
+worldCross = (0.0, 0.0, 1.0);
+worldThrough = (1.0, 0.0, 0.0);
+sense={'Clockwise':True,'AntiClockwise':False}
+
 def twoPI():
     result=math.pi*2.0
     return result
@@ -82,3 +88,18 @@ def ExtendedSineSq(theta):
     dSine *= (dSine*nSineSign)
     return dSine + nOffset
 
+class clPhasor:
+    def __init__(self, phase = 0, sense = 1):
+        self._phase = 0;
+        self._isClockwise = True;
+        self._initialized=False;
+            
+class clPhoton:
+    def __init__(self):
+        self.phasors = []
+    
+    def makeCircular(self, phase = 0, sense = 1):
+        self.phasors = []
+        self.phasors.Add(self, phase, sense)
+        #tmp = clPhasor()
+        #self.phasors.append(clPhasor
