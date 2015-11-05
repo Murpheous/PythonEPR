@@ -88,18 +88,77 @@ def ExtendedSineSq(theta):
     dSine *= (dSine*nSineSign)
     return dSine + nOffset
 
-class clPhasor:
-    def __init__(self, phase = 0, sense = 1):
-        self._phase = 0;
-        self._isClockwise = True;
-        self._initialized=False;
-            
-class clPhoton:
-    def __init__(self):
-        self.phasors = []
+class Analyzer:
+    def __init__(self, Axis = 0.0):
+        self._axis = 0.0
+        
+    @property
+    def Axis(self):
+        """Axis: the acute angle between the A Axis and world 'up' vector (±90 degrees)"""
+        return _axis
     
-    def makeCircular(self, phase = 0, sense = 1):
-        self.phasors = []
-        self.phasors.Add(self, phase, sense)
-        #tmp = clPhasor()
-        #self.phasors.append(clPhasor
+    @Axis.setter
+    def Axis(self,value):
+        self._axis = Limit90(value)
+
+class Phasor:
+    def __init__(self, PhaseAngle = 0, IsClockwise = True):
+        self._phaseAngle = PhaseAngle;
+        self._isClockwise = IsClockWise;
+        
+    @property
+    def Sense(self):
+        if self._isClockwise:
+            return 1
+        else:
+            return -1
+
+    @property
+    def IsClockWise(self):
+        return _isClockwise
+
+    @property
+    def PhaseAngle(self):
+        return _phaseAngle
+    
+    
+class Photon:
+    def __init__(self):
+        self._phasors = []
+
+    def AddPhasor(self, phaseAngle, bSense):
+        _phasors.Add(Phasor(Limit180(phaseAngle),bSense)))
+
+    def makeCircular(self, PhaseAngle, bSense = true)
+        self._phasors = []
+        self.AddPhasor(PhaseAngle,bSense)
+        
+    def makeLinear(self, LinearAxis, LinearPhase):
+        self._phasors = []
+        self.AddPhasor(LinearAxis + LinearPhase, True)
+        self.AddPhasor(LinearAxis - LinearPhase, False)
+
+    @property
+        """Phasors: List of phasors 1=Circular 2=Linear"""
+    def Phasors(self):
+        return self._phasors
+
+    # Analyze with respect to a particular analyzer axis   
+    def Analyze(self, AnalyzerAxis = 0.0):
+        if (Len(self._phasors) == 0):
+            return None
+        photonAxis = 0
+        for phasor in self._phasors:
+           photonAxis += Limit90(phasor.PhaseAngle)
+        photonAxis = photonAxis/Len(self._phasors)
+        MappedPhasors = []
+        for phasor in self._phasors:
+            NewPhasor = Phasor(phasor.PhaseAngle - photonAxis,phasor.IsClockWise)
+            mappedPhasors.Add(photonAxis += Limit90(phasor.PhaseAngle)
+        
+        return True
+
+    
+      
+        
+    
