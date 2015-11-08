@@ -186,11 +186,13 @@ class Photon:
             phaseDelta = (shiftSinSq - shiftSinSq * phasor.nSense)/4.0;
             effectivePhase = phasor.PhaseAngle + phaseDelta
             phasorResult = ShiftToPlusMinusOne(1 + ExtendedSinSq(effectivePhase))
-            nResult *= math.sign(phasorResult)
-            
+            if (phasorResult <= 0.5) or (phasorResult > 0.5):
+                nResult *= -1
                 
-        return True
-
+        if nResult > 0:
+            return True
+        else:
+            return False
     
       
         
