@@ -17,14 +17,14 @@ def quarterPI():
     result=math.pi/4.0
     return result
 
-def LimitUnity(arg)
+def ShiftToPlusMinusOne(arg):
     nCycles = math.trunc(arg)
-    if (arg >= 1.0)
+    if arg >= 1.0:
         nCycles = math.trunc((nCycles +1.0)/2.0)
-        arg = arg - 2.0 * nCycles
-    elif (arg <= -10.)
+        arg = arg - (2 * nCycles)
+    elif (arg <= -1.0):
         nCycles = math.trunc((nCycles -1.0)/2.0)
-        arg = arg - 2.0 * nCycles
+        arg = arg - (2 * nCycles)
     return arg
     
 def Limit180(theta): # Flip large angles back into base range +- 180
@@ -184,8 +184,9 @@ class Photon:
         nResult = 1
         for phasor in MappedPhasors:
             phaseDelta = (shiftSinSq - shiftSinSq * phasor.nSense)/4.0;
-            effectivePhase = phasor.PhaseAngle + phaseDelta;
-            phasorResult = (1 + ExtendedSinSq(effectivePhase))
+            effectivePhase = phasor.PhaseAngle + phaseDelta
+            phasorResult = ShiftToPlusMinusOne(1 + ExtendedSinSq(effectivePhase))
+            nResult *= math.sign(phasorResult)
             
                 
         return True
