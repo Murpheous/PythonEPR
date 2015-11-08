@@ -17,17 +17,26 @@ def quarterPI():
     result=math.pi/4.0
     return result
 
+def LimitUnity(arg)
+    nCycles = math.trunc(arg)
+    if (arg >= 1.0)
+        nCycles = math.trunc((nCycles +1.0)/2.0)
+        arg = arg - 2.0 * nCycles
+    elif (arg <= -10.)
+        nCycles = math.trunc((nCycles -1.0)/2.0)
+        arg = arg - 2.0 * nCycles
+    return arg
+    
 def Limit180(theta): # Flip large angles back into base range +- 180
     nPi = 0
     if (theta >= math.pi):
         nPi = math.trunc(theta/math.pi)
         nPi = math.trunc((nPi + 1)/2.0)
         theta = theta - (nPi*twoPI())
-    else:
-        if (theta <= -math.pi):
-            nPi = math.trunc(theta/math.pi)
-            nPi = (nPi - 1)/2
-            theta = theta - (nPi*twoPI())
+    elif (theta <= -math.pi):
+        nPi = math.trunc(theta/math.pi)
+        nPi = (nPi - 1)/2
+        theta = theta - (nPi*twoPI())
     return theta
 
 def Limit90(theta):
@@ -127,9 +136,9 @@ class Photon:
         self._phasors = []
 
     def AddPhasor(self, phaseAngle, bSense):
-        _phasors.Add(Phasor(Limit180(phaseAngle),bSense)))
+        _phasors.Add(Phasor(Limit180(phaseAngle),bSense))
 
-    def makeCircular(self, PhaseAngle, bSense = true)
+    def makeCircular(self, PhaseAngle, bSense = true):
         self._phasors = []
         self.AddPhasor(PhaseAngle,bSense)
         
@@ -139,14 +148,11 @@ class Photon:
         self.AddPhasor(LinearAxis - LinearPhase, False)
 
     @property
-        """Phasors: List of phasors 1=Circular 2=Linear"""
     def Phasors(self):
+        """Phasors: List of phasors 1=Circular 2=Linear"""
         return self._phasors
         
-    def Analyze(self, AnalyzerAxis = 0.0):
-        if (Len(self._phasors) == 0):
-            return None # empty photon returns null result
-'''
+    '''
     First step is to convert each phasor into an axis and a phase
     angle with respect to that axis.
     In the case of a linearly polarized photon, the 'photon axis'
@@ -157,6 +163,9 @@ class Photon:
     supplied by the analyzer. In this case a circularly porlrized
     photon is always treated as being at phase angle zero, with
     the axis aligned with the phasor. '''
+    def Analyze(self, AnalyzerAxis = 0.0):
+        if (Len(self._phasors) == 0):
+            return None # empty photon returns null result
         # In software this is done by calculating the artihmetic mean of the phase angle
         photonAxis = 0
         for phasor in self._phasors:
@@ -164,7 +173,7 @@ class Photon:
         photonAxis = photonAxis/Len(self._phasors)
         # Calculate the acute angle  between the photon Axis and the Analyzer Axis
         axisDelta = Limit90(photonAxis - AnalyzerAxis)
-        axisShift = ExtendedSinSq(axisDelta)
+        shiftSinSq = ExtendedSinSq(axisDelta)
 
         # Now map Phasor List onto Analyzer
         MappedPhasors = []
@@ -173,7 +182,11 @@ class Photon:
             MappedPhasors.Add(NewPhasor)
         # Now Calculate Results
         nResult = 1
-        for phasor in MappedPhasors
+        for phasor in MappedPhasors:
+            phaseDelta = (shiftSinSq - shiftSinSq * phasor.nSense)/4.0;
+            effectivePhase = phasor.PhaseAngle + phaseDelta;
+            phasorResult = (1 + ExtendedSinSq(effectivePhase))
+            
                 
         return True
 
