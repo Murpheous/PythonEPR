@@ -71,13 +71,13 @@ def ExtendedSine(theta):
     return result
 
 
-def ExtendedArcSinSq(value):
+def ExtendedArcSineSq(value):
     intpart = math.floor(value)
     fracpart = value - intpart
     return math.asin(math.sqrt(fracpart)) + halfPI()*intpart
 
 def ExtendedArcCosSq(value):
-    return ExtendedArcSinSq(value + 0.5) - quarterPI()
+    return ExtendedArcSineSq(value + 0.5) - quarterPI()
 
 def ExtendedSineSq(theta):
     nSineSign = 1
@@ -113,7 +113,7 @@ class Analyzer:
 class Phasor:
     def __init__(self, PhaseAngle = 0, IsClockwise = True):
         self._phaseAngle = PhaseAngle;
-        self._isClockwise = IsClockWise;
+        self._isClockwise = IsClockwise;
         
     @property
     def Sense(self):
@@ -124,25 +124,25 @@ class Phasor:
 
     @property
     def IsClockWise(self):
-        return _isClockwise
+        return self._isClockwise
 
     @property
     def PhaseAngle(self):
-        return _phaseAngle
+        return self._phaseAngle
     
     
 class Photon:
     def __init__(self):
         self._phasors = []
 
-    def AddPhasor(self, phaseAngle, bSense):
-        _phasors.Add(Phasor(Limit180(phaseAngle),bSense))
+    def AddPhasor(self, phaseAngle=0.0, bSense=True):
+        self._phasors.append(Phasor(Limit180(phaseAngle),bSense))
 
-    def makeCircular(self, PhaseAngle, bSense = true):
+    def MakeCircular(self, PhaseAngle, bSense = True):
         self._phasors = []
         self.AddPhasor(PhaseAngle,bSense)
         
-    def makeLinear(self, LinearAxis, LinearPhase):
+    def MakeLinear(self, LinearAxis, LinearPhase):
         self._phasors = []
         self.AddPhasor(LinearAxis + LinearPhase, True)
         self.AddPhasor(LinearAxis - LinearPhase, False)
@@ -164,28 +164,28 @@ class Photon:
     photon is always treated as being at phase angle zero, with
     the axis aligned with the phasor. '''
     def Analyze(self, AnalyzerAxis = 0.0):
-        if (Len(self._phasors) == 0):
+        if (len(self._phasors) == 0):
             return None # empty photon returns null result
         # In software this is done by calculating the artihmetic mean of the phase angle
         photonAxis = 0
         for phasor in self._phasors:
            photonAxis += Limit90(phasor.PhaseAngle)
-        photonAxis = photonAxis/Len(self._phasors)
+        photonAxis = photonAxis/len(self._phasors)
         # Calculate the acute angle  between the photon Axis and the Analyzer Axis
         axisDelta = Limit90(photonAxis - AnalyzerAxis)
-        shiftSinSq = ExtendedSinSq(axisDelta)
+        shiftSineSq = ExtendedSineSq(axisDelta)
 
         # Now map Phasor List onto Analyzer
         MappedPhasors = []
         for phasor in self._phasors:
             NewPhasor = Phasor(phasor.PhaseAngle - photonAxis,phasor.IsClockWise)
-            MappedPhasors.Add(NewPhasor)
+            MappedPhasors.append(NewPhasor)
         # Now Calculate Results
         nResult = 1
         for phasor in MappedPhasors:
-            phaseDelta = (shiftSinSq - shiftSinSq * phasor.nSense)/4.0;
+            phaseDelta = (shiftSineSq - shiftSineSq * phasor.Sense)/4.0
             effectivePhase = phasor.PhaseAngle + phaseDelta
-            phasorResult = ShiftToPlusMinusOne(1 + ExtendedSinSq(effectivePhase))
+            phasorResult = ShiftToPlusMinusOne(1 + ExtendedSineSq(effectivePhase))
             if (phasorResult <= 0.5) or (phasorResult > 0.5):
                 nResult *= -1
                 
