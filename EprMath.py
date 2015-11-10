@@ -173,7 +173,7 @@ class Photon:
         photonAxis = photonAxis/len(self._phasors)
         # Calculate the acute angle  between the photon Axis and the Analyzer Axis
         axisDelta = Limit90(photonAxis - AnalyzerAxis)
-        shiftSineSq = ExtendedSineSq(axisDelta)
+        shiftSineSq = ExtendedSineSq(axisDelta)*math.pi
 
         # Now map Phasor List onto Analyzer
         MappedPhasors = []
