@@ -185,7 +185,7 @@ class Photon:
         for phasor in MappedPhasors:
             phaseDelta = (shiftSineSq - shiftSineSq * phasor.Sense)/4.0
             effectivePhase = phasor.PhaseAngle + phaseDelta
-            phasorResult = ShiftToPlusMinusOne(1 + ExtendedSineSq(effectivePhase))
+            phasorResult = ShiftToPlusMinusOne(ExtendedSineSq(effectivePhase))
             if (phasorResult <= 0.5) or (phasorResult > 0.5):
                 nResult *= -1
                 
