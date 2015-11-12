@@ -178,15 +178,18 @@ class Photon:
         # Now map Phasor List onto Analyzer
         MappedPhasors = []
         for phasor in self._phasors:
+            phaseDelta = (shiftSineSq - shiftSineSq * phasor.Sense)/4.0
+            effectivePhase = phasor.PhaseAngle + phaseDelta
+            phasorResult = ExtendedSineSq(effectivePhase)*math.pi
             NewPhasor = Phasor(phasor.PhaseAngle - photonAxis,phasor.IsClockWise)
             MappedPhasors.append(NewPhasor)
         # Now Calculate Results
         nResult = 1
         for phasor in MappedPhasors:
-            phaseDelta = (shiftSineSq - shiftSineSq * phasor.Sense)/4.0
+            
             effectivePhase = phasor.PhaseAngle + phaseDelta
-            phasorResult = ShiftToPlusMinusOne(ExtendedSineSq(effectivePhase))
-            if (phasorResult <= 0.5) or (phasorResult > 0.5):
+            phasorResult = ShiftToPlusMinusOne()
+            if (phasorResult <= -0.5) or (phasorResult > 0.5):
                 nResult *= -1
                 
         if nResult > 0:
