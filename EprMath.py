@@ -27,7 +27,7 @@ def ShiftToPlusMinusOne(arg):
         arg = arg - (2 * nCycles)
     return arg
     
-def Limit180(theta): # Flip large angles back into base range +- 180
+def LimitPi(theta): # Flip large angles back into base range +- 180
     nPi = 0
     if (theta >= math.pi):
         nPi = math.trunc(theta/math.pi)
@@ -39,8 +39,8 @@ def Limit180(theta): # Flip large angles back into base range +- 180
         theta = theta - (nPi*twoPI())
     return theta
 
-def Limit90(theta):
-    theta = Limit180(theta)
+def LimitHalfPi(theta):
+    theta = LimitPi(theta)
     if (theta > halfPI()):
         theta = theta-math.pi
     else:
@@ -108,9 +108,9 @@ class Analyzer:
     
     @Axis.setter
     def Axis(self,value):
-        self._axis = Limit90(value)
+        self._axis = LimitHalfPi(value)
 
-class Phasor:
+class PhotonPhasor:
     def __init__(self, PhaseAngle = 0, IsClockwise = True):
         self._phaseAngle = PhaseAngle;
         self._isClockwise = IsClockwise;
@@ -129,6 +129,31 @@ class Phasor:
     @property
     def PhaseAngle(self):
         return self._phaseAngle
+
+class AnalyzerPhasor:
+    def __init__(self, Axis= 0, PhaseAngle = 0, IsClockwise = True):
+        self._phaseAngle = LimitPi(PhaseAngle)
+        self._isClockwise = IsClockwise
+        self._axis = Axis    
+
+    @property
+    def Sense(self):
+        if self._isClockwise:
+            return 1
+        else:
+            return -1
+
+    @property
+    def IsClockWise(self):
+        return self._isClockwise
+
+    @property
+    def Phase(self):
+        return self._phaseAngle
+
+    @property
+    def Axis(self):
+        return self._axis
     
     
 class Photon:
@@ -136,7 +161,7 @@ class Photon:
         self._phasors = []
 
     def AddPhasor(self, phaseAngle=0.0, bSense=True):
-        self._phasors.append(Phasor(Limit180(phaseAngle),bSense))
+        self._phasors.append(PhotonPhasor(LimitPi(phaseAngle),bSense))
 
     def MakeCircular(self, PhaseAngle, bSense = True):
         self._phasors = []
@@ -167,21 +192,21 @@ class Photon:
         if (len(self._phasors) == 0):
             return None # empty photon returns null result
         # In software this is done by calculating the artihmetic mean of the phase angle
-        photonAxis = 0
+        mappedAxis = 0
         for phasor in self._phasors:
-           photonAxis += Limit90(phasor.PhaseAngle)
-        photonAxis = photonAxis/len(self._phasors)
+           mappedAxis += LimitHalfPi(phasor.PhaseAngle)
+        mappedAxis = mappedAxis/len(self._phasors)
         # Calculate the acute angle  between the photon Axis and the Analyzer Axis
-        axisDelta = Limit90(photonAxis - AnalyzerAxis)
+        axisDelta = LimitHalfPi(mappedAxis - AnalyzerAxis)
         shiftSineSq = ExtendedSineSq(axisDelta)*math.pi
 
-        # Now map Phasor List onto Analyzer
-        MappedPhasors = []
+        # Now map Photon' Phasor List onto Analyzer
         for phasor in self._phasors:
+            anaPhasor = AnalyzerPhasor(mappedAxis
             phaseDelta = (shiftSineSq - shiftSineSq * phasor.Sense)/4.0
             effectivePhase = phasor.PhaseAngle + phaseDelta
             phasorResult = ExtendedSineSq(effectivePhase)*math.pi
-            NewPhasor = Phasor(phasor.PhaseAngle - photonAxis,phasor.IsClockWise)
+            NewPhasor = PhotonPhasor(phasor.PhaseAngle - mappedAxis,phasor.IsClockWise)
             MappedPhasors.append(NewPhasor)
         # Now Calculate Results
         nResult = 1
