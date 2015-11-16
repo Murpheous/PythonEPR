@@ -131,9 +131,9 @@ class PhotonPhasor:
         return self._phaseAngle
 
 class AnalyzerPhasor:
-    def __init__(self, Axis= 0, PhaseAngle = 0, IsClockwise = True):
+    def __init__(self, Axis= 0, PhaseAngle = 0, Sense = 1):
         self._phaseAngle = LimitPi(PhaseAngle)
-        self._isClockwise = IsClockwise
+        self._isClockwise = (Sense >= 0)
         self._axis = Axis    
 
     @property
@@ -199,25 +199,20 @@ class Photon:
         # Calculate the acute angle  between the photon Axis and the Analyzer Axis
         axisDelta = LimitHalfPi(mappedAxis - AnalyzerAxis)
         shiftSineSq = ExtendedSineSq(axisDelta)*math.pi
-
-        # Now map Photon' Phasor List onto Analyzer
-        for phasor in self._phasors:
-            anaPhasor = AnalyzerPhasor(mappedAxis
-            phaseDelta = (shiftSineSq - shiftSineSq * phasor.Sense)/4.0
-            effectivePhase = phasor.PhaseAngle + phaseDelta
-            phasorResult = ExtendedSineSq(effectivePhase)*math.pi
-            NewPhasor = PhotonPhasor(phasor.PhaseAngle - mappedAxis,phasor.IsClockWise)
-            MappedPhasors.append(NewPhasor)
-        # Now Calculate Results
         nResult = 1
-        for phasor in MappedPhasors:
-            
-            effectivePhase = phasor.PhaseAngle + phaseDelta
-            phasorResult = ShiftToPlusMinusOne()
+        # Iterate through phasors
+        for phasor in self._phasors:
+            # Photon's Phasor onto Analyzer
+            analyzerPhase = phasor.PhaseAngle - mappedAxis
+            # mappedPhasor = AnalyzerPhasor(mappedAxis, analyzerPhase, phasor.Sense)
+
+            # Now Calculate Results
+            phaseOffset = (shiftSineSq - shiftSineSq * phasor.Sense)/4.0
+            effectivePhase = analyzerPhase + phaseOffset
+            mappedResult = ShiftToPlusMinusOne(ExtendedSineSq(effectivePhase))
             if (phasorResult <= -0.5) or (phasorResult > 0.5):
                 nResult *= -1
-                
-        if nResult > 0:
+        if nResult >= 0:
             return True
         else:
             return False
