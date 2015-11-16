@@ -210,7 +210,7 @@ class Photon:
             phaseOffset = (shiftSineSq - shiftSineSq * phasor.Sense)/4.0
             effectivePhase = analyzerPhase + phaseOffset
             mappedResult = ShiftToPlusMinusOne(ExtendedSineSq(effectivePhase))
-            if (phasorResult <= -0.5) or (phasorResult > 0.5):
+            if (mappedResult <= -0.5) or (mappedResult > 0.5):
                 nResult *= -1
         if nResult >= 0:
             return True
