@@ -203,14 +203,15 @@ class Photon:
         # Iterate through phasors
         for phasor in self._phasors:
             # Photon's Phasor onto Analyzer
-            analyzerPhase = phasor.PhaseAngle - mappedAxis
+            analyzerPhase = mappedAxis - phasor.PhaseAngle
             # mappedPhasor = AnalyzerPhasor(mappedAxis, analyzerPhase, phasor.Sense)
 
             # Now Calculate Results
             phaseOffset = (shiftSineSq - shiftSineSq * phasor.Sense)/4.0
             effectivePhase = analyzerPhase + phaseOffset
             mappedResult = ShiftToPlusMinusOne(ExtendedSineSq(effectivePhase))
-            if (mappedResult <= -0.5) or (mappedResult > 0.5):
+            mappedPi = mappedResult*math.pi
+            if (mappedResult >= -0.5) and (mappedResult < 0.5):
                 nResult *= -1
         if nResult >= 0:
             return True
