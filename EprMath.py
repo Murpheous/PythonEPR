@@ -112,8 +112,8 @@ class Analyzer:
 
 class PhotonPhasor:
     def __init__(self, PhaseAngle = 0, IsClockwise = True):
-        self._phaseAngle = PhaseAngle;
-        self._isClockwise = IsClockwise;
+        self._phaseAngle = PhaseAngle
+        self._isClockwise = IsClockwise
         
     @property
     def Sense(self):
@@ -172,6 +172,9 @@ class Photon:
         self.AddPhasor(LinearAxis + LinearPhase, True)
         self.AddPhasor(LinearAxis - LinearPhase, False)
 
+    def MakeLinearDegrees(self, AxisDeg, PhaseDeg):
+        self.MakeLinear((AxisDeg*math.pi)/180.0,(PhaseDeg*math.pi)/180.0)
+ 
     @property
     def Phasors(self):
         """Phasors: List of phasors 1=Circular 2=Linear"""
@@ -194,8 +197,9 @@ class Photon:
         # In software this is done by calculating the artihmetic mean of the phase angle
         mappedAxis = 0
         for phasor in self._phasors:
-           mappedAxis += LimitHalfPi(phasor.PhaseAngle)
+           mappedAxis += LimitPi(phasor.PhaseAngle)
         mappedAxis = mappedAxis/len(self._phasors)
+        mappedAxis = LimitHalfPi(mappedAxis)
         # Calculate the acute angle  between the photon Axis and the Analyzer Axis
         axisDelta = LimitHalfPi(mappedAxis - AnalyzerAxis)
         shiftSineSq = ExtendedSineSq(axisDelta)*math.pi
