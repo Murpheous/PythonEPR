@@ -27,11 +27,25 @@ def makeMalus():
             PhaseRadians = (PhaseDecimalDeg*math.pi)/1800.0
             photon = EprMath.Photon()
             photon.MakeLinear(AxisRadians,PhaseRadians)
-            if photon.Analyze(0.0) == True:
-                Alice += 1
-            else:
-                Bob += 1
+            nResult = photon.Analyze(0.0)
+            if nResult != None:
+                if nResult == True:
+                    Alice += 1
+                else:
+                    Bob += 1
         fracAlice = float(Alice)/float(Alice + Bob)
         csvfile.write('{0};{1}\n'.format(AxisDelta,fracAlice))
     csvfile.close()
         
+def correlate():
+    csvfile = open("Correlate.csv", "w")
+    csvfile.write('"Theta";"Rate"\n')
+    for AxisDelta in range(0,90):
+        SameCount = 0
+        DifferCount = 0
+        for pairOrientation in range(0,3600):
+            photonAlice = EprMath.Photon()
+            photonBob = EprMath.Photon()
+            photonAlice.MakeCircular()
+        csvfile.write('{0};{1}\n'.format(AxisDelta,fracSame))
+    csvfile.close()
