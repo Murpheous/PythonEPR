@@ -41,11 +41,22 @@ def correlate():
     csvfile = open("Correlate.csv", "w")
     csvfile.write('"Theta";"Rate"\n')
     for AxisDelta in range(0,90):
-        SameCount = 0
-        DifferCount = 0
-        for pairOrientation in range(0,3600):
+        SameCount = 0.0
+        DifferCount = 0.0
+        Total = 0.0
+        for pairOrientation in range(-1799,1800):
             photonAlice = EprMath.Photon()
             photonBob = EprMath.Photon()
-            photonAlice.MakeCircular()
-        csvfile.write('{0};{1}\n'.format(AxisDelta,fracSame))
+            PhaseAngle = (pairOrientation*math.pi)/1800.0
+            photonAlice.MakeCircular(PhaseAngle,True)
+            photonBob.MakeCircular(PhaseAngle,False)
+            resultAlice = photonAlice.Analyze(0)
+            resultBob = photonBob.Analyze(AxisDelta)
+            if (resultBob == resultAlice):
+                SameCount += 1.0
+            else:
+                DifferCount += -1.0
+            Total = Total + 1
+        correlation = (SameCount + DifferCount)/Total        
+        csvfile.write('{0};{1}\n'.format(AxisDelta,correlation))
     csvfile.close()

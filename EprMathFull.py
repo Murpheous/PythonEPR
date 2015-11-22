@@ -1,8 +1,9 @@
 import math
+
 # Vector definitions
-worldUp = (0.0, 1.0, 0.0);
-worldCross = (0.0, 0.0, 1.0);
-worldThrough = (1.0, 0.0, 0.0);
+worldUp = [0.0, 1.0, 0.0];
+worldCross = [0.0, 0.0, 1.0];
+worldThrough = [1.0, 0.0, 0.0];
 sense={'Clockwise':True,'AntiClockwise':False}
 
 def twoPI():

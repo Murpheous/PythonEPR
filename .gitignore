@@ -42,3 +42,10 @@ Network Trash Folder
 Temporary Items
 .apdisk
 __pycache__/EprMath.cpython-35.pyc
+Correlate.csv
+euclid/euclid.py
+euclid/PKG-INFO
+euclid/setup.py
+euclid/README
+__pycache__/EprMath.cpython-35.pyc
+*.pyc

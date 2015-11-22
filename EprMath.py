@@ -1,12 +1,64 @@
 import math
-# Vector definitions
+import np
 
+# Spatial definitions
+worldUp = [0.0, 1.0, 0.0];
+worldCross = [0.0, 0.0, 1.0];
+worldThrough = [1.0, 0.0, 0.0];
+
+def t(theta):
+    return 1-math.cos(theta)
+
+def a1(angle,  axis, tr, cos):
+    return (tr * axis[0] * axis[0]) + cos;
+    
+def a2(angle,  axis, tr, sin):
+    return (tr * axis[0] * axis[1]) - (sin * axis[2])
+    
+def a3(angle,  axis, tr, sin):
+    return (tr * axis[0] * axis[2]) + (sin * axis[1])
+
+def b1(angle,  axis, tr, sin):
+    return (tr * axis[0] * axis[1]) + (sin * axis[2])
+
+def b2(angle,  axis, tr, cos):
+    return (tr * axis[1] * axis[1]) + cos
+
+def b3(angle,  axis, tr, sin):
+    return (tr * axis[1] * axis[2]) - (sin * axis[0])
+
+def c1(angle,  axis, tr, sin):
+    return (tr * axis[0] * axis[2]) - (sin * axis[1])
+
+def c2(angle,  axis, tr, sin):
+    return (tr * axis[1] * axis[2]) + (sin * axis[0])
+
+def c3(angle,  axis, tr, cos):
+    return (tr * axis[2] * axis[2]) + cos
+
+def RotateAroundAxis( v, axis, angle):
+   
+    result = [0.0,0.0,0.0]
+    tr = t(angle);
+    cos = math.cos(angle);
+    sin = math.sin(angle);
+
+    result[0] = a1(angle, axis, tr, cos) * v[0] + a2(angle, axis, tr, sin) * v[1] + a3(angle, axis, tr, sin) * v[2];
+    result[1] = b1(angle, axis, tr, sin) * v[0] + b2(angle, axis, tr, cos) * v[1] + b3(angle, axis, tr, sin) * v[2];
+    result[2] = c1(angle, axis, tr, sin) * v[0] + c2(angle, axis, tr, sin) * v[1] + c3(angle, axis, tr, cos) * v[2]; 
+
+    return result;
+    
 def halfPI():
     result=math.pi/2.0
     return result
 
 def quarterPI():
     result=math.pi/4.0
+    return result
+
+def twoPI():
+    result = math.pi + math.pi
     return result
 
 def ShiftToPlusMinusOne(arg):
@@ -91,7 +143,23 @@ class PhotonPhasor:
     def PhaseAngle(self):
         return self._phaseAngle
 
-    
+class VectorPhoton:
+        def __init__(self):
+            _spinAxis = worldCross
+            # phase zero vector: The intersection between planes defined by normal
+            # to analyzer face (worldThrough), and the plane of spin (i.e. the plane normal
+            # to the spin axis) of the polarized beam.
+            _phaseZeroVector = worldUp
+            # The phaseVector is the actual instantaneous phase of the particular photon
+            _phaseVec = worldUp         
+
+        def MakeCircular(self, phaseAngle = 0.0, bSense= True):
+            if (bSense):
+                _spinAxis = worldThrough
+            else:
+                _spinAxis = worldThrough*-1;
+            _phaseVec = RotateAroundAxis( worldUp, _spinAxis, phaseAngle)
+            
 class Photon:
     def __init__(self):
         self._phasors = []
