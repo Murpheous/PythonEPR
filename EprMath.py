@@ -154,14 +154,12 @@ class VectorPhoton:
             _phaseVec = worldUp         
 
         def MakeCircular(self, phaseAngle = 0.0, bSense= True):
-            if (bSense):
-                _spinAxis = worldThrough
-            else:
-                _spinAxis = worldThrough*-1;
             _phaseVec = RotateAroundAxis( worldUp, _spinAxis, phaseAngle)
             
 class Photon:
     def __init__(self):
+        _spinAxis = worldCross
+
         self._phasors = []
 
     def AddPhasor(self, phaseAngle=0.0, bSense=True):
@@ -169,7 +167,10 @@ class Photon:
 
     def MakeCircular(self, PhaseAngle, bSense = True):
         self._phasors = []
-        self.AddPhasor(PhaseAngle,bSense)
+        if (bSense):
+            _spinAxis = worldThrough
+        else:
+            _spinAxis = worldThrough*-1;
         
     def MakeLinear(self, LinearAxis, LinearPhase):
         self._phasors = []
