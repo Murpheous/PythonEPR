@@ -2,10 +2,23 @@ import math
 import np
 
 # Spatial definitions
-worldUp = [0.0, 1.0, 0.0];
-worldCross = [0.0, 0.0, 1.0];
-worldThrough = [1.0, 0.0, 0.0];
+worldUp = [0.0, 1.0, 0.0]
+worldCross = [0.0, 0.0, 1.0]
+worldThrough = [1.0, 0.0, 0.0]
 
+def halfPI():
+    result=math.pi/2.0
+    return result
+
+def quarterPI():
+    result=math.pi/4.0
+    return result
+
+def twoPI():
+    result = math.pi + math.pi
+    return result
+
+# Vector3 Library Functions Adapted for Python - very cut-down
 def t(theta):
     return 1-math.cos(theta)
 
@@ -36,31 +49,45 @@ def c2(angle,  axis, tr, sin):
 def c3(angle,  axis, tr, cos):
     return (tr * axis[2] * axis[2]) + cos
 
+# Rotate Vector[3] v around axis vector, by angle
 def RotateAroundAxis( v, axis, angle):
-   
     result = [0.0,0.0,0.0]
-    tr = t(angle);
-    cos = math.cos(angle);
-    sin = math.sin(angle);
+    tr = t(angle)
+    cos = math.cos(angle)
+    sin = math.sin(angle)
 
-    result[0] = a1(angle, axis, tr, cos) * v[0] + a2(angle, axis, tr, sin) * v[1] + a3(angle, axis, tr, sin) * v[2];
-    result[1] = b1(angle, axis, tr, sin) * v[0] + b2(angle, axis, tr, cos) * v[1] + b3(angle, axis, tr, sin) * v[2];
-    result[2] = c1(angle, axis, tr, sin) * v[0] + c2(angle, axis, tr, sin) * v[1] + c3(angle, axis, tr, cos) * v[2]; 
+    result[0] = a1(angle, axis, tr, cos) * v[0] + a2(angle, axis, tr, sin) * v[1] + a3(angle, axis, tr, sin) * v[2]
+    result[1] = b1(angle, axis, tr, sin) * v[0] + b2(angle, axis, tr, cos) * v[1] + b3(angle, axis, tr, sin) * v[2]
+    result[2] = c1(angle, axis, tr, sin) * v[0] + c2(angle, axis, tr, sin) * v[1] + c3(angle, axis, tr, cos) * v[2]
+    return result
 
-    return result;
+# Cross product of vector v1 with v2
+def CrossProduct(v1, v2):
+    result = []
+    result.append(v1[1] * v2[2] - v1[2] * v2[1])
+    result.append(v1[2] * v2[0] - v1[0] * v2[2])
+    result.append(v1[0] * v2[1] - v1[1] * v2[0])
+    return result
+
+# Dot Product Vector V1 and V2
+def DotProduct(v1, v2):
+    return (v1[0]*v2[0] + v1[1]*v2[1] + v1[2]* 2[2])
+
+# Signed Vector Angle between refVector and otherVector sense WRT normalVector
+def SignedVectorAngle(referenceVector, otherVector, normalVector):
+    dot = DotProduct(referenceVector, otherVector);
+    if (dot > 1.0):
+        dot = 1.0
+    if (dot < -1.0):
+        dot = -1.0
+    result = math.acos(dot);
+    if result != 0.0:
+        perpVector = CrossProduct(normalVector, referenceVector)
+        if DotProduct(perpVector, otherVector) < 0.0:
+            result = -result
+    return result
     
-def halfPI():
-    result=math.pi/2.0
-    return result
-
-def quarterPI():
-    result=math.pi/4.0
-    return result
-
-def twoPI():
-    result = math.pi + math.pi
-    return result
-
+# Function to bring cyclic value into range +- 1 
 def ShiftToPlusMinusOne(arg):
     nCycles = math.trunc(arg)
     if arg >= 1.0:
@@ -70,7 +97,8 @@ def ShiftToPlusMinusOne(arg):
         nCycles = math.trunc((nCycles -1.0)/2.0)
         arg = arg - (2 * nCycles)
     return arg
-    
+
+# Function to limit and angle between +- 180deg
 def LimitPi(theta): # Flip large angles back into base range +- 180
     nPi = 0
     if (theta >= math.pi):
@@ -83,6 +111,7 @@ def LimitPi(theta): # Flip large angles back into base range +- 180
         theta = theta - (nPi*twoPI())
     return theta
 
+# Limit and angle to +- 90 deg
 def LimitHalfPi(theta):
     theta = LimitPi(theta)
     if (theta > halfPI()):
@@ -92,6 +121,7 @@ def LimitHalfPi(theta):
             theta = theta+math.pi
     return theta
 
+# Asymmetric version of sine-square by multipling by sign of argument
 def ExtendedSineSq(theta):
     nSineSign = 1
     integerPart = math.trunc(theta/halfPI())
@@ -110,20 +140,7 @@ def ExtendedSineSq(theta):
     dSine *= (dSine*nSineSign)
     return dSine + nOffset
 
-class Analyzer:
-    def __init__(self, Axis = 0.0):
-        self._axis = 0.0
-        
-    @property
-    def Axis(self):
-        """Axis: the acute angle between the A Axis and world 'up' vector (±90 degrees)"""
-        return _axis
-    
-    @Axis.setter
-    def Axis(self,value):
-        self._axis = LimitHalfPi(value)
-
-class PhotonPhasor:
+class Phasor:
     def __init__(self, PhaseAngle = 0, IsClockwise = True):
         self._phaseAngle = PhaseAngle
         self._isClockwise = IsClockwise
@@ -144,18 +161,48 @@ class PhotonPhasor:
         return self._phaseAngle
 
 class VectorPhoton:
-        def __init__(self):
-            _spinAxis = worldCross
-            # phase zero vector: The intersection between planes defined by normal
-            # to analyzer face (worldThrough), and the plane of spin (i.e. the plane normal
-            # to the spin axis) of the polarized beam.
-            _phaseZeroVector = worldUp
-            # The phaseVector is the actual instantaneous phase of the particular photon
-            _phaseVec = worldUp         
-
-        def MakeCircular(self, phaseAngle = 0.0, bSense= True):
-            _phaseVec = RotateAroundAxis( worldUp, _spinAxis, phaseAngle)
+    def __init__(self):
+        self._spinAxis = worldCross
+        # phase zero vector: The intersection between planes defined by normal
+        # to analyzer face (worldThrough), and the plane of spin (i.e. the plane normal
+        # to the spin axis) of the polarized beam.
+        self._zeroPhase = worldUp
+        self._phaseAngle = 0.0
+        self._phasors = []
             
+    def MakeCircular(self, phaseAngle = 0.0, bSense= True):
+        if bSense:
+            self._spinAxis = worldThrough
+        else:
+            self._spinAxis = worldThrough * -1
+        self._zeroPhase = RotateAroundAxis( worldUp, _spinAxis, phaseAngle)
+        self._phaseAngle = 0.0
+            
+
+    def MakeLinear(self, inclination = 0.0, phase = 0.0, bSense = true):
+        if bSense:
+            self._spinAxis = worldCross
+        else:
+            self._spinAxis = worldCross * -1
+        self._spinAxis = RotateAroundAxis( spinAxis, worldThrough, inclination)
+        self._zeroPhase = RotateAroundAxis( worldUp, worldThrough, inclination)
+        self._phaseAngle = LimitPi(phase)
+            
+    def Analyze(self, AnalyzerAxis = 0.0):
+        AxisVec = RotateAroundAxis(worldUp,worldThrough, AnalyzerAxis)
+        AxisDelta = SignedVectorAngle(axisVec,self._zeroPhase, worldThrough)
+        shiftSineSq = (ExtendedSineSq(AxisDelta)*math.pi)/4.0
+        nResult = 1
+        for sense in range( 1, -1, -2):
+            # calculate cross-phase from forwared-rear phase
+            phaseOffset = (shiftSineSq - shiftSineSq * phasor.Sense)
+            effectivePhase = sense*self._phaseAngle + phaseOffset
+            mappedResult = ShiftToPlusMinusOne(ExtendedSineSq(effectivePhase))
+            mappedPi = mappedResult*math.pi
+            if (mappedResult < -0.5) or (mappedResult >= 0.5):
+                nResult *= -1
+        return (nResult >= 0)
+
 class Photon:
     def __init__(self):
         _spinAxis = worldCross
@@ -163,7 +210,7 @@ class Photon:
         self._phasors = []
 
     def AddPhasor(self, phaseAngle=0.0, bSense=True):
-        self._phasors.append(PhotonPhasor(LimitPi(phaseAngle),bSense))
+        self._phasors.append(Phasor(LimitPi(phaseAngle),bSense))
 
     def MakeCircular(self, PhaseAngle, bSense = True):
         self._phasors = []
