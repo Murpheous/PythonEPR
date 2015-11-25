@@ -1,5 +1,5 @@
 import math
-import np
+
 
 # Spatial definitions
 worldUp = [0.0, 1.0, 0.0]
@@ -71,7 +71,7 @@ def CrossProduct(v1, v2):
 
 # Dot Product Vector V1 and V2
 def DotProduct(v1, v2):
-    return (v1[0]*v2[0] + v1[1]*v2[1] + v1[2]* 2[2])
+    return (v1[0]*v2[0] + v1[1]*v2[1] + v1[2]* v2[2])
 
 # Signed Vector Angle between refVector and otherVector sense WRT normalVector
 def SignedVectorAngle(referenceVector, otherVector, normalVector):
@@ -81,7 +81,7 @@ def SignedVectorAngle(referenceVector, otherVector, normalVector):
     if (dot < -1.0):
         dot = -1.0
     result = math.acos(dot);
-    if result != 0.0:
+    if result != 1.0:
         perpVector = CrossProduct(normalVector, referenceVector)
         if DotProduct(perpVector, otherVector) < 0.0:
             result = -result
@@ -162,13 +162,13 @@ class Phasor:
 
 class VectorPhoton:
     def __init__(self):
-        self._spinAxis = worldCross
+        _spinAxis = worldCross
         # phase zero vector: The intersection between planes defined by normal
         # to analyzer face (worldThrough), and the plane of spin (i.e. the plane normal
         # to the spin axis) of the polarized beam.
-        self._zeroPhase = worldUp
-        self._phaseAngle = 0.0
-        self._phasors = []
+        _zeroPhase = worldUp
+        _phaseAngle = 0.0
+        _phasors = []
             
     def MakeCircular(self, phaseAngle = 0.0, bSense= True):
         if bSense:
@@ -179,23 +179,23 @@ class VectorPhoton:
         self._phaseAngle = 0.0
             
 
-    def MakeLinear(self, inclination = 0.0, phase = 0.0, bSense = true):
+    def MakeLinear(self, inclination = 0.0, phase = 0.0, bSense = True):
         if bSense:
-            self._spinAxis = worldCross
+            initialAxis = worldCross
         else:
-            self._spinAxis = worldCross * -1
-        self._spinAxis = RotateAroundAxis( spinAxis, worldThrough, inclination)
+            initialAxis = worldCross * -1
+        self._spinAxis = RotateAroundAxis( initialAxis, worldThrough, inclination)
         self._zeroPhase = RotateAroundAxis( worldUp, worldThrough, inclination)
         self._phaseAngle = LimitPi(phase)
             
     def Analyze(self, AnalyzerAxis = 0.0):
         AxisVec = RotateAroundAxis(worldUp,worldThrough, AnalyzerAxis)
-        AxisDelta = SignedVectorAngle(axisVec,self._zeroPhase, worldThrough)
+        AxisDelta = SignedVectorAngle(AxisVec,self._zeroPhase, worldThrough)
         shiftSineSq = (ExtendedSineSq(AxisDelta)*math.pi)/4.0
         nResult = 1
         for sense in range( 1, -1, -2):
-            # calculate cross-phase from forwared-rear phase
-            phaseOffset = (shiftSineSq - shiftSineSq * phasor.Sense)
+            # calculate cross-phase from fore-aft phase
+            phaseOffset = (shiftSineSq - shiftSineSq * sense)
             effectivePhase = sense*self._phaseAngle + phaseOffset
             mappedResult = ShiftToPlusMinusOne(ExtendedSineSq(effectivePhase))
             mappedPi = mappedResult*math.pi
