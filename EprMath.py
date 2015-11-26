@@ -168,17 +168,19 @@ class VectorPhoton:
         # phase zero vector: The intersection between planes defined by normal
         # to analyzer face (worldThrough), and the plane of spin (i.e. the plane normal
         # to the spin axis) of the polarized beam.
-        _zeroPhase = worldUp
+        _phaseVec = worldUp
         _phaseAngle = 0.0
         _phasors = []
             
     def MakeCircular(self, phaseAngle = 0.0, bSense= True):
+        # Spin Axis is either forward or back
         if bSense:
             spinAxis = worldThrough
         else:
             spinAxis = worldBack
-        zeroPhase = RotateAroundAxis( worldUp, spinAxis, phaseAngle)
-        self._zeroPhase = zeroPhase
+        #
+        phaseVec = RotateAroundAxis( worldUp, spinAxis, phaseAngle)
+        self._phaseVec = phaseVec
         self._spinAxis = spinAxis
         self._phaseAngle = 0.0
             
@@ -189,12 +191,12 @@ class VectorPhoton:
         else:
             initialAxis = worldLeft
         self._spinAxis = RotateAroundAxis( initialAxis, worldThrough, inclination)
-        self._zeroPhase = RotateAroundAxis( worldUp, worldThrough, inclination)
+        self._phaseVec = RotateAroundAxis( worldUp, worldThrough, inclination)
         self._phaseAngle = LimitPi(phase)
             
     def Analyze(self, AnalyzerAxis = 0.0):
         AxisVec = RotateAroundAxis(worldUp,worldThrough, AnalyzerAxis)
-        AxisDelta = SignedVectorAngle(AxisVec,self._zeroPhase, worldThrough)
+        AxisDelta = SignedVectorAngle(AxisVec,self._phaseVec, worldThrough)
         shiftSineSq = (ExtendedSineSq(AxisDelta)*math.pi)/4.0
         nResult = 1
         for sense in range( 1, -2, -2):
