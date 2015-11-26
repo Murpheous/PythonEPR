@@ -40,7 +40,7 @@ def makeMalus():
 def vecMalus():
     csvfile = open("VecMalus.csv", "w")
     csvfile.write('"Theta";"Rate"\n')
-    for AxisDelta in range(0,90):
+    for AxisDelta in range(0,91):
         Alice = 0
         Bob = 0
         AxisRadians = (AxisDelta*math.pi)/180.0
@@ -58,6 +58,30 @@ def vecMalus():
         csvfile.write('{0};{1}\n'.format(AxisDelta,fracAlice))
     csvfile.close()
     
+def vecCorrelate():
+    csvfile = open("VecCorrelate.csv", "w")
+    csvfile.write('"Theta";"Rate"\n')
+    for AxisDelta in range(0,91):
+        SameCount = 0.0
+        DifferCount = 0.0
+        Total = 0.0
+        for pairOrientation in range(-1800,1800):
+            photonAlice = EprMath.VectorPhoton()
+            photonBob = EprMath.VectorPhoton()
+            PhaseAngle = (pairOrientation*math.pi)/1800.0
+            photonAlice.MakeCircular(PhaseAngle,True)
+            photonBob.MakeCircular(PhaseAngle,False)
+            resultAlice = photonAlice.Analyze(0)
+            resultBob = photonBob.Analyze(AxisDelta)
+            if (resultBob == resultAlice):
+                SameCount += 1.0
+            else:
+                DifferCount += -1.0
+            Total = Total + 1
+        correlation = (SameCount + DifferCount)/Total        
+        csvfile.write('{0};{1}\n'.format(AxisDelta,correlation))
+    csvfile.close()
+
 def correlate():
     csvfile = open("Correlate.csv", "w")
     csvfile.write('"Theta";"Rate"\n')

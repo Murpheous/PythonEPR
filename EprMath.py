@@ -3,8 +3,10 @@ import math
 
 # Spatial definitions
 worldUp = [0.0, 1.0, 0.0]
-worldCross = [0.0, 0.0, 1.0]
+worldRight = [0.0, 0.0, 1.0]
+worldLeft = [0.0, 0.0, -1.0]
 worldThrough = [1.0, 0.0, 0.0]
+worldBack = [-1.0, 0.0, 0.0]
 
 def halfPI():
     result=math.pi/2.0
@@ -162,7 +164,7 @@ class Phasor:
 
 class VectorPhoton:
     def __init__(self):
-        _spinAxis = worldCross
+        _spinAxis = worldRight
         # phase zero vector: The intersection between planes defined by normal
         # to analyzer face (worldThrough), and the plane of spin (i.e. the plane normal
         # to the spin axis) of the polarized beam.
@@ -172,18 +174,20 @@ class VectorPhoton:
             
     def MakeCircular(self, phaseAngle = 0.0, bSense= True):
         if bSense:
-            self._spinAxis = worldThrough
+            spinAxis = worldThrough
         else:
-            self._spinAxis = worldThrough * -1
-        self._zeroPhase = RotateAroundAxis( worldUp, _spinAxis, phaseAngle)
+            spinAxis = worldBack
+        zeroPhase = RotateAroundAxis( worldUp, spinAxis, phaseAngle)
+        self._zeroPhase = zeroPhase
+        self._spinAxis = spinAxis
         self._phaseAngle = 0.0
             
 
     def MakeLinear(self, inclination = 0.0, phase = 0.0, bSense = True):
         if bSense:
-            initialAxis = worldCross
+            initialAxis = worldRight
         else:
-            initialAxis = worldCross * -1
+            initialAxis = worldLeft
         self._spinAxis = RotateAroundAxis( initialAxis, worldThrough, inclination)
         self._zeroPhase = RotateAroundAxis( worldUp, worldThrough, inclination)
         self._phaseAngle = LimitPi(phase)
@@ -193,7 +197,7 @@ class VectorPhoton:
         AxisDelta = SignedVectorAngle(AxisVec,self._zeroPhase, worldThrough)
         shiftSineSq = (ExtendedSineSq(AxisDelta)*math.pi)/4.0
         nResult = 1
-        for sense in range( 1, -1, -2):
+        for sense in range( 1, -2, -2):
             # calculate cross-phase from fore-aft phase
             phaseOffset = (shiftSineSq - shiftSineSq * sense)
             effectivePhase = sense*self._phaseAngle + phaseOffset
@@ -205,7 +209,7 @@ class VectorPhoton:
 
 class Photon:
     def __init__(self):
-        _spinAxis = worldCross
+        _spinAxis = worldRight
 
         self._phasors = []
 
